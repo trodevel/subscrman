@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-// $Revision: 5643 $ $Date:: 2017-02-01 #$ $Author: serge $
+// $Revision: 5700 $ $Date:: 2017-02-06 #$ $Author: serge $
 
 #ifndef SUBSCR_MAN_T_H
 #define SUBSCR_MAN_T_H
@@ -34,10 +34,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 namespace subscrman
 {
 
-template <class SUBS, typename SUBS_ID, typename REQ_ID>
+template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
 class SubscrManT
 {
-protected:
+public:
+
+    SubscrManT( OWNER * owner );
 
     bool init( const std::string & name );
 
@@ -52,6 +54,8 @@ protected:
 
     template <class OBJ>
     void forward_event_to_subs( const OBJ * obj, const SUBS_ID subs_id );
+
+    void assign_request_with_subs( const SUBS_ID subs_id, const REQ_ID req_id );
 
 private:
 
@@ -68,12 +72,14 @@ protected:
     MapReqIdToSubsId            map_req_id_to_subs_id_;
 
 private:
+    OWNER                       * owner_;
+
     std::string                 name_;
 };
 
-template <class SUBS, typename SUBS_ID, typename REQ_ID>
+template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
 template <class OBJ>
-void SubscrManT<SUBS,SUBS_ID,REQ_ID>::forward_request_to_subs( const OBJ * obj, const SUBS_ID subs_id, const REQ_ID req_id )
+void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_request_to_subs( const OBJ * obj, const SUBS_ID subs_id, const REQ_ID req_id )
 {
     auto it = map_subs_id_to_subs_.find( subs_id );
 
@@ -85,7 +91,7 @@ void SubscrManT<SUBS,SUBS_ID,REQ_ID>::forward_request_to_subs( const OBJ * obj, 
 
     auto subs = it->second;
 
-    auto _b = map_req_id_to_subs_id_.insert( MapReqIdToSubsId::value_type( req_id, subs_id ) ).second;
+    auto _b = map_req_id_to_subs_id_.insert( typename MapReqIdToSubsId::value_type( req_id, subs_id ) ).second;
 
     ASSERT( _b );
 
@@ -94,16 +100,18 @@ void SubscrManT<SUBS,SUBS_ID,REQ_ID>::forward_request_to_subs( const OBJ * obj, 
     remove_if_closed( subs, subs_id );
 }
 
-template <class SUBS, typename SUBS_ID, typename REQ_ID>
-bool SubscrManT<SUBS,SUBS_ID,REQ_ID>::init( const std::string & name )
+template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
+bool SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::init( const std::string & name )
 {
     name_   = name;
+
+    return true;
 }
 
-template <class SUBS, typename SUBS_ID, typename REQ_ID>
-bool SubscrManT<SUBS,SUBS_ID,REQ_ID>::add( const SUBS_ID subs_id, SUBS subs )
+template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
+bool SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::add( const SUBS_ID subs_id, SUBS subs )
 {
-    auto b = map_subs_id_to_subs_.insert( MapSubsIdToSubs::value_type( subs_id, subs ) ).second;
+    auto b = map_subs_id_to_subs_.insert( typename MapSubsIdToSubs::value_type( subs_id, subs ) ).second;
 
     if( b == false )
     {
@@ -116,8 +124,8 @@ bool SubscrManT<SUBS,SUBS_ID,REQ_ID>::add( const SUBS_ID subs_id, SUBS subs )
     return true;
 }
 
-template <class SUBS, typename SUBS_ID, typename REQ_ID>
-bool SubscrManT<SUBS,SUBS_ID,REQ_ID>::remove( const SUBS_ID subs_id )
+template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
+bool SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::remove( const SUBS_ID subs_id )
 {
     auto it = map_subs_id_to_subs_.find( subs_id );
 
@@ -134,9 +142,9 @@ bool SubscrManT<SUBS,SUBS_ID,REQ_ID>::remove( const SUBS_ID subs_id )
     return true;
 }
 
-template <class SUBS, typename SUBS_ID, typename REQ_ID>
+template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
 template <class OBJ>
-void SubscrManT<SUBS,SUBS_ID,REQ_ID>::forward_response_to_subs( const OBJ * obj, const REQ_ID req_id )
+void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_response_to_subs( const OBJ * obj, const REQ_ID req_id )
 {
     auto it = map_req_id_to_subs_id_.find( req_id );
 
@@ -153,9 +161,9 @@ void SubscrManT<SUBS,SUBS_ID,REQ_ID>::forward_response_to_subs( const OBJ * obj,
     forward_event_to_subs( obj, subs_id );
 }
 
-template <class SUBS, typename SUBS_ID, typename REQ_ID>
+template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
 template <class OBJ>
-void SubscrManT<SUBS,SUBS_ID,REQ_ID>::forward_event_to_subs( const OBJ * obj, const SUBS_ID subs_id )
+void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_event_to_subs( const OBJ * obj, const SUBS_ID subs_id )
 {
     auto it = map_subs_id_to_subs_.find( subs_id );
 
@@ -169,15 +177,38 @@ void SubscrManT<SUBS,SUBS_ID,REQ_ID>::forward_event_to_subs( const OBJ * obj, co
 
     subs->handle( obj );
 
-    remove_if_closed( subs, subs_id, 0 );
+    remove_if_closed( subs, subs_id );
 }
 
-template <class SUBS, typename SUBS_ID, typename REQ_ID>
-void SubscrManT<SUBS,SUBS_ID,REQ_ID>::remove_if_closed( SUBS subs, const SUBS_ID subs_id )
+template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
+void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::assign_request_with_subs( const SUBS_ID subs_id, const REQ_ID req_id )
+{
+    auto it = map_subs_id_to_subs_.find( subs_id );
+
+    if( it == map_subs_id_to_subs_.end() )
+    {
+        dummy_log_info( name_, "cannot assign request with subs, subs id %u not found", subs_id );
+        return;
+    }
+
+    auto subs = it->second;
+
+    auto _b = map_req_id_to_subs_id_.insert( typename MapReqIdToSubsId::value_type( req_id, subs_id ) ).second;
+
+    ASSERT( _b );
+}
+
+template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
+void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::remove_if_closed( SUBS subs, const SUBS_ID subs_id )
 {
     if( subs->is_closed() )
     {
-        remove( subs_id );
+        auto b = remove( subs_id );
+
+        if( b )
+        {
+            owner_->on_subs_remove( subs_id );
+        }
     }
 }
 
