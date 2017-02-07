@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-// $Revision: 5700 $ $Date:: 2017-02-06 #$ $Author: serge $
+// $Revision: 5716 $ $Date:: 2017-02-07 #$ $Author: serge $
 
 #ifndef SUBSCR_MAN_T_H
 #define SUBSCR_MAN_T_H
@@ -41,7 +41,7 @@ public:
 
     SubscrManT( OWNER * owner );
 
-    bool init( const std::string & name );
+    bool init( const uint32_t log_id );
 
     bool add( const SUBS_ID subs_id, SUBS subs );
     bool remove( const SUBS_ID subs_id );
@@ -74,8 +74,15 @@ protected:
 private:
     OWNER                       * owner_;
 
-    std::string                 name_;
+    uint32_t                    log_id_;
 };
+
+template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
+SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::SubscrManT( OWNER * owner ):
+    owner_( owner ),
+    log_id_( 0 )
+{
+}
 
 template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
 template <class OBJ>
@@ -85,7 +92,7 @@ void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_request_to_subs( const OBJ *
 
     if( it == map_subs_id_to_subs_.end() )
     {
-        dummy_log_info( name_, "cannot forward to subs, subs id %u not found", subs_id );
+        dummy_log_info( log_id_, "cannot forward to subs, subs id %u not found", subs_id );
         return;
     }
 
@@ -101,9 +108,9 @@ void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_request_to_subs( const OBJ *
 }
 
 template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
-bool SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::init( const std::string & name )
+bool SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::init( const uint32_t log_id )
 {
-    name_   = name;
+    log_id_   = log_id;
 
     return true;
 }
@@ -115,11 +122,11 @@ bool SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::add( const SUBS_ID subs_id, SUBS sub
 
     if( b == false )
     {
-        dummy_log_info( name_, "cannot add subs, subs id %u already exists", subs_id );
+        dummy_log_info( log_id_, "cannot add subs, subs id %u already exists", subs_id );
         return false;
     }
 
-    dummy_log_debug( name_, "added subs id %u", subs_id );
+    dummy_log_debug( log_id_, "added subs id %u", subs_id );
 
     return true;
 }
@@ -131,13 +138,13 @@ bool SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::remove( const SUBS_ID subs_id )
 
     if( it == map_subs_id_to_subs_.end() )
     {
-        dummy_log_info( name_, "cannot remove subs, subs id %u not found", subs_id );
+        dummy_log_info( log_id_, "cannot remove subs, subs id %u not found", subs_id );
         return false;
     }
 
     map_subs_id_to_subs_.erase( it );
 
-    dummy_log_debug( name_, "removed subs id %u", subs_id );
+    dummy_log_debug( log_id_, "removed subs id %u", subs_id );
 
     return true;
 }
@@ -150,7 +157,7 @@ void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_response_to_subs( const OBJ 
 
     if( it == map_req_id_to_subs_id_.end() )
     {
-        dummy_log_info( name_, "cannot forward to subs, req id %u not found", req_id );
+        dummy_log_info( log_id_, "cannot forward to subs, req id %u not found", req_id );
         return;
     }
 
@@ -169,7 +176,7 @@ void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_event_to_subs( const OBJ * o
 
     if( it == map_subs_id_to_subs_.end() )
     {
-        dummy_log_info( name_, "cannot forward to subs, subs id %u not found", subs_id );
+        dummy_log_info( log_id_, "cannot forward to subs, subs id %u not found", subs_id );
         return;
     }
 
@@ -187,7 +194,7 @@ void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::assign_request_with_subs( const SUBS
 
     if( it == map_subs_id_to_subs_.end() )
     {
-        dummy_log_info( name_, "cannot assign request with subs, subs id %u not found", subs_id );
+        dummy_log_info( log_id_, "cannot assign request with subs, subs id %u not found", subs_id );
         return;
     }
 
@@ -207,7 +214,7 @@ void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::remove_if_closed( SUBS subs, const S
 
         if( b )
         {
-            owner_->on_subs_remove( subs_id );
+            owner_->on_subs_removed( subs_id );
         }
     }
 }
