@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-// $Revision: 5716 $ $Date:: 2017-02-07 #$ $Author: serge $
+// $Revision: 5732 $ $Date:: 2017-02-09 #$ $Author: serge $
 
 #ifndef SUBSCR_MAN_T_H
 #define SUBSCR_MAN_T_H
@@ -203,6 +203,8 @@ void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::assign_request_with_subs( const SUBS
     auto _b = map_req_id_to_subs_id_.insert( typename MapReqIdToSubsId::value_type( req_id, subs_id ) ).second;
 
     ASSERT( _b );
+
+    dummy_log_debug( log_id_, "assigned request with subs: subs id %u, req id %u", subs_id, req_id );
 }
 
 template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
