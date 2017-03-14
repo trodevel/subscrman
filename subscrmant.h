@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-// $Revision: 5732 $ $Date:: 2017-02-09 #$ $Author: serge $
+// $Revision: 6018 $ $Date:: 2017-03-14 #$ $Author: serge $
 
 #ifndef SUBSCR_MAN_T_H
 #define SUBSCR_MAN_T_H
@@ -194,7 +194,7 @@ void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::assign_request_with_subs( const SUBS
 
     if( it == map_subs_id_to_subs_.end() )
     {
-        dummy_log_info( log_id_, "cannot assign request with subs, subs id %u not found", subs_id );
+        dummy_log_info( log_id_, "cannot associate request with subs, subs id %u not found", subs_id );
         return;
     }
 
@@ -204,7 +204,7 @@ void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::assign_request_with_subs( const SUBS
 
     ASSERT( _b );
 
-    dummy_log_debug( log_id_, "assigned request with subs: subs id %u, req id %u", subs_id, req_id );
+    dummy_log_debug( log_id_, "associated request with subs: subs id %u, req id %u", subs_id, req_id );
 }
 
 template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
