@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-// $Revision: 6018 $ $Date:: 2017-03-14 #$ $Author: serge $
+// $Revision: 9670 $ $Date:: 2018-08-29 #$ $Author: serge $
 
 #ifndef SUBSCR_MAN_T_H
 #define SUBSCR_MAN_T_H
@@ -47,13 +47,13 @@ public:
     bool remove( const SUBS_ID subs_id );
 
     template <class OBJ>
-    void forward_request_to_subs( const OBJ * obj, const SUBS_ID subs_id, const REQ_ID req_id );
+    void forward_request_to_subs( OBJ obj, const SUBS_ID subs_id, const REQ_ID req_id );
 
     template <class OBJ>
-    void forward_response_to_subs( const OBJ * obj, const REQ_ID req_id );
+    void forward_response_to_subs( OBJ obj, const REQ_ID req_id );
 
     template <class OBJ>
-    void forward_event_to_subs( const OBJ * obj, const SUBS_ID subs_id );
+    void forward_event_to_subs( OBJ obj, const SUBS_ID subs_id );
 
     void assign_request_with_subs( const SUBS_ID subs_id, const REQ_ID req_id );
 
@@ -86,7 +86,7 @@ SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::SubscrManT( OWNER * owner ):
 
 template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
 template <class OBJ>
-void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_request_to_subs( const OBJ * obj, const SUBS_ID subs_id, const REQ_ID req_id )
+void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_request_to_subs( OBJ obj, const SUBS_ID subs_id, const REQ_ID req_id )
 {
     auto it = map_subs_id_to_subs_.find( subs_id );
 
@@ -151,7 +151,7 @@ bool SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::remove( const SUBS_ID subs_id )
 
 template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
 template <class OBJ>
-void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_response_to_subs( const OBJ * obj, const REQ_ID req_id )
+void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_response_to_subs( OBJ obj, const REQ_ID req_id )
 {
     auto it = map_req_id_to_subs_id_.find( req_id );
 
@@ -170,7 +170,7 @@ void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_response_to_subs( const OBJ 
 
 template <class OWNER, class SUBS, typename SUBS_ID, typename REQ_ID>
 template <class OBJ>
-void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_event_to_subs( const OBJ * obj, const SUBS_ID subs_id )
+void SubscrManT<OWNER,SUBS,SUBS_ID,REQ_ID>::forward_event_to_subs( OBJ obj, const SUBS_ID subs_id )
 {
     auto it = map_subs_id_to_subs_.find( subs_id );
 
